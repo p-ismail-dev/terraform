@@ -2,15 +2,12 @@ resource "aws_instance" "example" {
   ami           = "ami-0220d79f3f480ecf5"
   instance_type = "t3.micro"
   vpc_security_group_ids = [ aws_security_group.allow_tls.id ]
-#self is the special variable
-   provisioner "local-exec" {
-    command = "echo ${self.public_ip}   > inventory.ini"
-  }
 
-  tags = {
-    Name = "provisioners-demo"
-    Project = "roboshop"
-  }
+  tags = merge(
+    var.common_tags,
+    var.ec2_tags
+
+  )
 }
 
 resource "aws_security_group" "allow_tls" {  #This is for terraform
@@ -33,7 +30,8 @@ resource "aws_security_group" "allow_tls" {  #This is for terraform
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name = "allow-all-terraform"
-  }
+  tags = merge(
+    var.common_tags,
+    var.sg_tags
+  )
 }
